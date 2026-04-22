@@ -71,10 +71,13 @@ def compare():
 
         difference, match_score = compare_images(before_path, after_path)
 
-        return jsonify({
-            "difference": difference,
-            "match_score": match_score
-        })
+     
+if difference < 0.05:
+    return jsonify({
+        "difference": difference,
+        "match_score": match_score,
+        "status": "no_change"
+    })
 
     except Exception as e:
         return jsonify({
