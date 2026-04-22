@@ -65,32 +65,34 @@ def compare():
         if not file1 or not file2:
             return jsonify({"error": "Missing files"}), 400
 
-        # Save unique files (IMPORTANT FIX)
+        # Save files
         file1.save(before_path)
         file2.save(after_path)
 
         difference, match_score = compare_images(before_path, after_path)
 
-     
-if difference < 0.05:
-    return jsonify({
-        "difference": difference,
-        "match_score": match_score,
-        "status": "no_change"
-    })
+        # ✅ MUST BE INSIDE TRY
+        if difference < 0.05:
+            return jsonify({
+                "difference": difference,
+                "match_score": match_score,
+                "status": "no_change"
+            })
+
+        return jsonify({
+            "difference": difference,
+            "match_score": match_score,
+            "status": "processed"
+        })
 
     except Exception as e:
-        return jsonify({
-            "error": str(e)
-        }), 500
+        return jsonify({"error": str(e)}), 500
 
     finally:
-        # Always delete files (even if error)
         if os.path.exists(before_path):
             os.remove(before_path)
         if os.path.exists(after_path):
             os.remove(after_path)
-
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)
